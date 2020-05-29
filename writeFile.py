@@ -1,5 +1,5 @@
 from lxml import html
-# This file collects the Soup from the page of a tweet and writes
+# This file collects the Soup from the page of a tweet and writes to file
 import requests
 from bs4 import BeautifulSoup
 
