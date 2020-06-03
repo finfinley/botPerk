@@ -1,8 +1,4 @@
-# TODO: Implement headless for selenium
-
-import requests
-import time
-import botometer
+import time, botometer
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from lxml import html
@@ -49,7 +45,7 @@ def scroll_to_bottom(driver):
                 list_of_usernames = [x.text for x in usernameSoup]
                 # Prints current loot of usernames
                 text = ', '.join(list_of_usernames)
-                print("SCROLLINGS LOOT:", text)
+                print("SCROLLING LOOT:", text)
                 print("LEN:", len(list_of_usernames))
                 # Extends master list of usernames
                 FULL_LIST.extend(list_of_usernames)
@@ -69,8 +65,13 @@ def scroll_to_bottom(driver):
                 print("FULL LIST: ", len(FULL_LIST))
         # Plugs usernames into bom        
         for screen_name, results in bom.check_accounts_in(FULL_LIST):
+            print('Busy hunting bots...')
+            try:
                 if results['display_scores']['user'] > 3.0:
                         bots.append(results['user']['screen_name'])
+                        print('Bot found.')
+            except KeyError:
+                pass            
 
         print("Total Bots: ", len(bots))
         print("Bot accounts: ", bots)
@@ -80,7 +81,7 @@ def scroll_to_bottom(driver):
 
 driver.get(url)
 scroll_to_bottom(driver)
-driver.quit()
+#driver.quit()
 
 
 
