@@ -1,8 +1,4 @@
-# TODO: Implement headless for selenium
-
-import requests
-import time
-import botometer
+import time, botometer
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from lxml import html
@@ -11,16 +7,15 @@ from selenium.webdriver.common.keys import Keys
 
 url = ("https://twitter.com/realDonaldTrump/status/1265827032707072000")
 driver = webdriver.Chrome(
-    'C:/Users/alexf/OneDrive/Documents/Python Projects/chromedriver.exe')
+    'Chomedriver/path/here')
 
 # Twitter API / Bot-o-meter Info
-# now it's called rapidapi key
 rapidapi_key = "d8f34cfb8bmshcc45a662c421371p1ab8ddjsn33c9d9b68e66"
 twitter_app_auth = {
-    'consumer_key': '3YI6rE8z8naJtUZmFn3Fr1VZF',
-    'consumer_secret': 'kspiJwiRaQm1ou3RnYMbXS3riTCYNm6DCEbrsqdELgCyfvKzry',
-    'access_token': '1265347900449730561-BmJNnFLhyLY16su199eiw217LDU35Q',
-    'access_token_secret': 'zavatHUoEbf96OXD8RgZoat416MGSFe0529vTZYgh9NZt',
+    'consumer_key': 'CONSUMERKEYHERE',
+    'consumer_secret': 'CONSUMERSECRETHERE',
+    'access_token': 'ACCESSTOKENHERE',
+    'access_token_secret': 'ACCESSTOKENSECRETHERE',
 }
 bom = botometer.Botometer(wait_on_ratelimit=True,
                           rapidapi_key=rapidapi_key,
@@ -49,7 +44,7 @@ def scroll_to_bottom(driver):
                 list_of_usernames = [x.text for x in usernameSoup]
                 # Prints current loot of usernames
                 text = ', '.join(list_of_usernames)
-                print("SCROLLINGS LOOT:", text)
+                print("SCROLLING LOOT:", text)
                 print("LEN:", len(list_of_usernames))
                 # Extends master list of usernames
                 FULL_LIST.extend(list_of_usernames)
@@ -69,8 +64,13 @@ def scroll_to_bottom(driver):
                 print("FULL LIST: ", len(FULL_LIST))
         # Plugs usernames into bom        
         for screen_name, results in bom.check_accounts_in(FULL_LIST):
+            print('Busy hunting bots...')
+            try:
                 if results['display_scores']['user'] > 3.0:
                         bots.append(results['user']['screen_name'])
+                        print('Bot found.')
+            except KeyError:
+                pass            
 
         print("Total Bots: ", len(bots))
         print("Bot accounts: ", bots)
@@ -80,7 +80,7 @@ def scroll_to_bottom(driver):
 
 driver.get(url)
 scroll_to_bottom(driver)
-driver.quit()
+#driver.quit()
 
 
 
