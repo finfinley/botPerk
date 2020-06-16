@@ -8,7 +8,7 @@ from twython import Twython
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-url = ("https://twitter.com/realDonaldTrump/status/1268888880264155136")
+url = ("https://twitter.com/realDonaldTrump/status/1272871304572678144")
 driver = webdriver.Chrome(executable_path='C:/Users/alexf/OneDrive/Documents/Python Projects/chromedriver.exe')
 
 # Bot-o-meter Info
@@ -33,12 +33,9 @@ accessTokenSecret = 'zavatHUoEbf96OXD8RgZoat416MGSFe0529vTZYgh9NZt'
 api = Twython(apiKey, apiSecret, accessToken, accessTokenSecret)
 
 
-
-def scroll_to_bottom(driver,scrolltime):
+def scroll_to_bottom(driver, url, scrolltime, FULL_LIST):
         print('Beginning hunt...')
-        # Empty list for all the usernames scraped
-        FULL_LIST = []
-        bots = []
+        driver.get(url)
 
         old_position = 0
         new_position = None
@@ -62,12 +59,12 @@ def scroll_to_bottom(driver,scrolltime):
                 justUsers = [x for x in matching if " " not in x]
                 print("SCROLLING LOOT: ", justUsers)
                 print("LEN:", len(justUsers))
-                
+
                 # Extends master list of usernames
                 FULL_LIST.extend(justUsers)
                 # Deletes any duplicates in FULL_LIST
                 FULL_LIST = list(dict.fromkeys(FULL_LIST))
-    
+
                 # Sleep and Scroll
                 time.sleep(scrolltime)
 
@@ -81,6 +78,10 @@ def scroll_to_bottom(driver,scrolltime):
                 " window.pageYOffset : (document.documentElement ||"
                 " document.body.parentNode || document.body);"))
                 print("FULL LIST: ", len(FULL_LIST))
+        return FULL_LIST
+
+# Hunts for bots using bom 
+def botHunt(FULL_LIST):
         # Plugs usernames into bom        
         for screen_name, results in bom.check_accounts_in(FULL_LIST):
             print('Busy hunting bots...')
@@ -96,19 +97,27 @@ def scroll_to_bottom(driver,scrolltime):
         print("Bot accounts: ", bots)
         print("Out of {}",format(len(FULL_LIST)))
 
-        tweetStr = url + " Total bots found: " + str(len(bots)) + " out of " + str(len(FULL_LIST))
+        return bots
 
-        api.update_status(status = tweetStr)
-        print("Tweet sent.")
-        
+# Tweets findings
+def tweetBots(bots, FULL_LIST):
+    tweetStr = url + " Total bots found: " + str(len(bots)) + " out of " + str(len(FULL_LIST))
 
-driver.get(url)
-scroll_to_bottom(driver, 10)
-driver.get(url)
-scroll_to_bottom(driver, 20)
-driver.get(url)
-scroll_to_bottom(driver, 30)
-driver.quit()
+    api.update_status(status = tweetStr)
+    print("Tweet sent.")
+
+# Empty list for all the usernames scraped
+FULL_LIST = []
+bots = []
+
+# Continous scrape
+num = 10 
+for i in range(num):
+        FULL_LIST = scroll_to_bottom(driver, url, 3, FULL_LIST)
+        print("Refreshing...", 1 + i)
+
+bots = botHunt(FULL_LIST)
+tweetBots(bots, FULL_LIST)
 
 
 
