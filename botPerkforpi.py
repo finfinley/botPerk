@@ -1,4 +1,4 @@
-import requests, time, botometer, sys
+import time, botometer, tweepy
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from lxml import html
@@ -8,8 +8,9 @@ from twython import Twython
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-url = ("https://twitter.com/realDonaldTrump/status/1272871304572678144")
+url = ("https://twitter.com/realDonaldTrump/status/1272972387034771456")
 driver = webdriver.Chrome(executable_path='C:/Users/alexf/OneDrive/Documents/Python Projects/chromedriver.exe')
+# pi path = /usr/bin/chromedriver
 
 # Bot-o-meter Info
 rapidapi_key = "d8f34cfb8bmshcc45a662c421371p1ab8ddjsn33c9d9b68e66"
@@ -32,6 +33,22 @@ accessTokenSecret = 'zavatHUoEbf96OXD8RgZoat416MGSFe0529vTZYgh9NZt'
 
 api = Twython(apiKey, apiSecret, accessToken, accessTokenSecret)
 
+# Tweepy API Info
+CONSUMER_KEY = '3YI6rE8z8naJtUZmFn3Fr1VZF'
+CONSUMER_SECRET = 'kspiJwiRaQm1ou3RnYMbXS3riTCYNm6DCEbrsqdELgCyfvKzry'
+
+ACCESS_TOKEN = '1265347900449730561-BmJNnFLhyLY16su199eiw217LDU35Q'
+ACCESS_SECRET = 'zavatHUoEbf96OXD8RgZoat416MGSFe0529vTZYgh9NZt'
+
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+tweepyapi = tweepy.API(auth)
+
+def getURL():
+        tweet = tweepyapi.user_timeline('realDonaldTrump')[0]
+        url = 'https://twitter.com/realDonaldTrump/status/' + str(tweet.id)
+
+        return url
 
 def scroll_to_bottom(driver, url, scrolltime, FULL_LIST):
         print('Beginning hunt...')
@@ -95,7 +112,7 @@ def botHunt(FULL_LIST):
 
         print("Total Bots: ", len(bots))
         print("Bot accounts: ", bots)
-        print("Out of {}",format(len(FULL_LIST)))
+        print("Out of ",format(len(FULL_LIST)))
 
         return bots
 
@@ -106,18 +123,41 @@ def tweetBots(bots, FULL_LIST):
     api.update_status(status = tweetStr)
     print("Tweet sent.")
 
+# Replies to tweet with bots 
+def reply(bots):
+        tweet = tweepyapi.user_timeline('botPerk')[0]
+        callem = " @".join(bots)
+        string = '@botPerk @' + callem
+        string2 = "@botPerk If your account has been mentioned, that means I've detected bot-like qualities with your account. There's a chance you're not a bot and I've made a mistake. DM me for more information"
+
+        tweepyapi.update_status(string, tweet.id )
+        tweepyapi.update_status(string2, tweet.id )
+        print("Replied.")
+        
+# Start time
+start_time = time.time()
+
 # Empty list for all the usernames scraped
 FULL_LIST = []
 bots = []
 
+# Gets most recent tweet 
+url = getURL()
+
 # Continous scrape
-num = 10 
+num = 3 
 for i in range(num):
         FULL_LIST = scroll_to_bottom(driver, url, 3, FULL_LIST)
         print("Refreshing...", 1 + i)
 
+driver.quit()
 bots = botHunt(FULL_LIST)
 tweetBots(bots, FULL_LIST)
+reply(bots)
+
+# End time
+end_time = time.time()
+print('I took %s to hunt today.' % (end_time - start_time)) 
 
 
 
