@@ -1,14 +1,13 @@
+#!/usr/bin/python3
+
 import time, botometer, tweepy
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from lxml import html
 from twython import Twython
-
-#!/usr/bin/python
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-url = ("https://twitter.com/realDonaldTrump/status/1272972387034771456")
 driver = webdriver.Chrome(executable_path='C:/Users/alexf/OneDrive/Documents/Python Projects/chromedriver.exe')
 # pi path = /usr/bin/chromedriver
 
@@ -133,9 +132,10 @@ def reply(bots):
         tweepyapi.update_status(string, tweet.id )
         tweepyapi.update_status(string2, tweet.id )
         print("Replied.")
-        
+
 # Start time
 start_time = time.time()
+tweepyapi.update_status("Beginning the hunt...")
 
 # Empty list for all the usernames scraped
 FULL_LIST = []
@@ -145,19 +145,22 @@ bots = []
 url = getURL()
 
 # Continous scrape
-num = 3 
+num = 100 
 for i in range(num):
         FULL_LIST = scroll_to_bottom(driver, url, 3, FULL_LIST)
         print("Refreshing...", 1 + i)
-
 driver.quit()
+
+# Hunts for bots found from scrape
 bots = botHunt(FULL_LIST)
+# Tweets findings 
 tweetBots(bots, FULL_LIST)
+# Tags botlike users
 reply(bots)
 
 # End time
 end_time = time.time()
-print('I took %s to hunt today.' % (end_time - start_time)) 
+print('I took %s seconds to hunt today.' % (end_time - start_time)) 
 
 
 
